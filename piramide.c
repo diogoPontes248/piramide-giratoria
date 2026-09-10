@@ -1,17 +1,16 @@
 #include <stdio.h>
 #include <string.h>
-#include <windows.h>
 #include <math.h>
 
 float A = 0.0, B = 0.0, C = 0.0;
 
-float cubeWidth = 21;
-int width = 160;
-int height = 44;
-float zBuffer[160* 44];
-char buffer[160* 44];
+float cubeWidth = 30;
+int width = 121;
+int height = 29;
+float zBuffer[121* 29];
+char buffer[121* 29];
 int backgroundASCIICode = ' ';
-int distanceFromCam = 100;
+int distanceFromCam = 150;
 float K1 = 40;
 
 float incrementSpeed = 0.6;
@@ -55,6 +54,13 @@ void calculateForSurface(float cubeX, float cubeY, float cubeZ, int ch){
     }
 }
 
+float modulo(float x){
+    if(x < 0){
+        return (-x);
+    }
+    return x;
+}
+
 int main()
 {
     printf("\x1b[2J");
@@ -64,35 +70,40 @@ int main()
 
         for(float cubeX = -cubeWidth; cubeX < cubeWidth; cubeX += incrementSpeed){
             for(float cubeY = -cubeWidth; cubeY < cubeWidth; cubeY += incrementSpeed){
-                calculateForSurface(cubeX, cubeY, -cubeWidth, '.');
+                for(float cubeZ = -cubeWidth; cubeZ < cubeWidth; cubeZ += incrementSpeed){
+                    int teste1 = cubeY < -2 * cubeX + cubeWidth;
+                    int teste2 = cubeY < 2 * cubeX + cubeWidth;
+                    int teste3 = cubeY < -2 * cubeZ + cubeWidth;
+                    int teste4 = cubeY < 2 * cubeZ + cubeWidth;
+
+                    if(cubeY < -2 * cubeX + cubeWidth + 1 && cubeY > -2 * cubeX + cubeWidth - 1 && teste3 && teste4){
+                        calculateForSurface(cubeX, cubeY, cubeZ, ';');
+                    }
+                    if(cubeY < 2 * cubeX + cubeWidth + 1 && cubeY > 2 * cubeX + cubeWidth - 1 && teste3 && teste4){
+                        calculateForSurface(cubeX, cubeY, cubeZ, '~');
+                    }
+                    if(cubeY < -2 * cubeZ + cubeWidth + 1 && cubeY > -2 * cubeZ + cubeWidth - 1 && teste1 && teste2){
+                        calculateForSurface(cubeX, cubeY, cubeZ, '$');
+                    }
+                    if(cubeY < 2 * cubeZ + cubeWidth + 1 && cubeY > 2 * cubeZ + cubeWidth - 1 && teste1 && teste2){
+                        calculateForSurface(cubeX, cubeY, cubeZ, '#');
+                    }
+                    if(cubeY < -cubeWidth + 1){
+                        calculateForSurface(cubeX, cubeY, cubeZ, '.');
+                    }
+                }
             }
         }
 
-        for(float cubeY = -cubeWidth; cubeY < cubeWidth; cubeY += incrementSpeed){
-            for(float cubeX = -cubeWidth; cubeX < cubeWidth; cubeX += incrementSpeed){
-                if(cubeY < 0 && cubeY < 0.5*cubeX - cubeWidth/2){
-                    //ignora os pontos do plano que nao pertencem ao triangulo isoceles
-                }
-                else if(cubeY > 0 && cubeY > -0.5*cubeX + cubeWidth/2){
-                    //ignora os pontos do plano que nao pertencem ao triangulo isoceles
-                }
-                else{
-                    calculateForSurface((cubeX + cubeWidth * sqrt(3))/2 - 28, cubeY, (cubeX*sqrt(3) - cubeWidth)/2 + 8, ';');
-                    calculateForSurface(cubeY, (cubeX - cubeWidth * sqrt(3))/2 + 7, (cubeX*sqrt(3) + cubeWidth)/2 -14, '$');
-                    calculateForSurface(-(cubeX - cubeWidth * sqrt(3))/2 -8, cubeY, (cubeX*sqrt(3) + cubeWidth )/2 -14, '~');
-                    calculateForSurface(-cubeY, -(cubeX - cubeWidth * sqrt(3))/2 - 8, (cubeX*sqrt(3) + cubeWidth )/2 - 13, '#');
-                }
-            }
-        }
         printf("\x1b[H");
 
         for(int k = 0; k < width * height; k++){
             putchar(k% width ? buffer[k] : 10);
         }
 
-        A += 0.03;
-        B += 0.08;
-        C += 0.08;
+        A += 0.09;
+        B += 0.09;
+        C += 0.09;
     }
     return 0;
 }
